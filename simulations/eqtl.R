@@ -1,17 +1,15 @@
 library(MatrixEQTL)
 
 base.dir = getwd()
-useModel = modelLINEAR #三种模型可选(modelANOVA or modelLINEAR or modelLINEAR_CROSS),这里我们选择modelLINEAR
+useModel = modelLINEAR #三种模型可选(modelANOVA or modelLINEAR or modelLINEAR_CROSS)
 SNP_file_name = paste(base.dir, "/SNP.txt", sep="") #获取SNP文件位置
-# SNP_file = data.table::fread(SNP_file_name, header=T) #读取SNP文件，可以在R中查看
-expression_file_name = paste(base.dir, "/GE.txt", sep="") #获取基因表达量文件位置
+expression_file_name = paste(base.dir, "/GE_pace.txt", sep="") #获取基因表达量文件位置
 # expression_file = data.table::fread(expression_file_name, header=T) #读取基因表达量文件，可以在R中查看
 covariates_file_name = character() #
 covariates_file_name = paste(base.dir, "/Covariates.txt", sep="") #读取协变量文件 #
-# covariates_file = data.table::fread(covariates_file_name, header=T) #读取协变量文件，可在R中查看
 output_file_name = tempfile() # 设置输出文件
 pvOutputThreshold = 1 #定义gene-SNP associations的显著性P值
-errorCovariance = numeric() #定义误差项的协方差矩阵 (用的很少)
+errorCovariance = numeric() #定义误差项的协方差矩阵
 
 #加载基因型文件
 snps = SlicedData$new() #创建SNP文件为S4对象（S4对象是该包的默认输入方式）
@@ -77,13 +75,11 @@ me = Matrix_eQTL_engine(  #进行eQTL分析的主要函数
 #结果
 cat('Analysis done in: ', me$time.in.sec, ' seconds', '\n'); #查看分析所用时间
 cat('Detected eQTLs:', '\n'); 
-# show(me$all$eqtls)  #查看超过阈值的eQTL
-#画所有p-value直方图
 plot(me)
 eqtl <- me$all$eqtls
 eqtl$gene |> unique() %>% length()
 
-eqtl %>% write_csv("eqtl_avg.csv")
+eqtl %>% write_csv("eqtl_pace.csv")
 
 # 准确率
 dfiv <- read_csv("../dfiv.csv")
@@ -95,5 +91,5 @@ ivs <- dfiv %>%
 
 eqtl <- as.data.table(eqtl)[FDR<0.05,][,pair:=paste(gene,snps,sep="_")]
 
-(eqtl[pair%in%ivs$pair,]|>nrow())/(eqtl|>nrow()) #TDR
+(eqtl[pair%in%ivs$pair,]|>nrow())/(eqtl|>nrow()) #Precision
 (eqtl[pair%in%ivs$pair,]|>nrow())/(ivs|>nrow()) #Recall
