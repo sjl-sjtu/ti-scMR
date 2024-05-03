@@ -9,16 +9,16 @@ colors <- pal(alpha = alpha)(n)
 
 
 
-# df1 <- fread("eqtl_avg_nocov.csv")[order(pvalue)]#[-nrow(df1),]
-df2 <- fread("eqtl_avg.csv")[order(pvalue)]#[-nrow(df2),]
-# df3 <- fread("eqtl_pace_nocov.csv")[order(pvalue)]#[-nrow(df3),]
-df4 <- fread("eqtl_pace.csv")[order(pvalue)]#[-nrow(df4),]
-df5 <- fread("eqtl_sc.csv")[order(pvalue)]#[-nrow(df5),]
-df6 <- fread("eqtl_sc_t_nointer.csv")[order(pvalue)]#[-nrow(df6),]
-df7 <- fread("eqtl_sc_t.csv")[order(pvalue)]#[-nrow(df7),]
-q1 <- ppoints(df1$pvalue)
+# df1 <- fread("eqtl_avg_nocov.csv")[order(pvalue)]
+df2 <- fread("eqtl_avg.csv")[order(pvalue)]
+# df3 <- fread("eqtl_pace_nocov.csv")[order(pvalue)]
+df4 <- fread("eqtl_pace.csv")[order(pvalue)]
+df5 <- fread("eqtl_sc.csv")[order(pvalue)]
+df6 <- fread("eqtl_sc_t_nointer.csv")[order(pvalue)]
+df7 <- fread("eqtl_sc_t.csv")[order(pvalue)]
+# q1 <- ppoints(df1$pvalue)
 q2 <- ppoints(df2$pvalue)
-q3 <- ppoints(df3$pvalue)
+# q3 <- ppoints(df3$pvalue)
 q4 <- ppoints(df4$pvalue)
 q5 <- ppoints(df5$pvalue)
 q6 <- ppoints(df6$pvalue)
