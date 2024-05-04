@@ -8,7 +8,7 @@ g <- 100 #gene num
 t <- 20 #total time
 
 # pre-processing
-setwd("mixed_sample")
+setwd("/lustre/home/acct-clsyzs/clsyzs/SunJianle/singleCellMR/simulation/n18/true_genome/dyn_eqtl/mixed_sample")
 df <- fread("sim_sc.csv")
 genelist <- paste0("gene",1:g)
 mtx <- round(t(df[,genelist,with=F]))
@@ -20,7 +20,7 @@ seurat_obj <- CreateSeuratObject(counts = mtx, meta.data = cell_meta)
 
 seurat_obj <- NormalizeData(seurat_obj,normalization.method = "LogNormalize",
                             scale.factor = 10000)
-df <- seurat_obj@assays$RNA@data %>% as.matrix() %>% t() %>% as_tibble()
+df <- seurat_obj@assays$RNA$data %>% as.matrix() %>% t() %>% as_tibble()
 df$id <- seurat_obj@meta.data$id
 df$cellid <- colnames(seurat_obj)
 df$pseudotime <- seurat_obj@meta.data$pseudotime
@@ -29,7 +29,7 @@ df %>% write_csv("sim_sc_norm.csv")
 
 all.genes <- rownames(seurat_obj)
 seurat_obj <- ScaleData(seurat_obj, features = all.genes)
-df <- seurat_obj@assays$RNA@scale.data %>% t() %>% as_tibble()
+df <- seurat_obj@assays$RNA$scale.data %>% t() %>% as_tibble()
 df$id <- seurat_obj@meta.data$id
 df$cellid <- colnames(seurat_obj)
 df$pseudotime <- seurat_obj@meta.data$pseudotime
@@ -102,7 +102,7 @@ print(run_time)
 colnames(cum_mat) <- genelist
 cum_mat <- as_tibble(cum_mat)
 cum_mat$sub <- exposureDat %>% group_by(sub) %>% group_keys() %>% pull(sub)
-outcomes <- paste0("Y",1:7)
+outcomes <- paste0("Y",1:4)
 cum_mat <- cum_mat %>% left_join(exposureDat  %>% dplyr::select(id,any_of(outcomes),sub) %>% 
                                    dplyr::distinct(sub,.keep_all = T),by="sub")
 cum_mat
@@ -138,7 +138,7 @@ gene$geneid <- paste0("gene",1:g)
 gene <- gene[,c("geneid",df$id),with=FALSE]
 gene %>% write_delim("GE_pace.txt")
 
-dat <- fread("../geno.csv")
+dat <- fread("../../geno.csv")
 snp <- t(dat[,paste0("snp",1:p),with=FALSE])
 colnames(snp) <- df$id
 snp <- as.data.table(snp)
@@ -174,7 +174,7 @@ gene$geneid <- paste0("gene",1:g)
 gene <- gene[,c("geneid",df$grid),with=FALSE]
 gene %>% write_delim("GE_sc.txt")
 
-dat <- fread("../geno.csv")
+dat <- fread("../../geno.csv")
 dat <- as.data.table(df)[,.(id,grid)][dat,on=.(id)]
 snp <- t(dat[,paste0("snp",1:p),with=FALSE])
 colnames(snp) <- df$grid
