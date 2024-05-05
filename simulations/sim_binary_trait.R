@@ -241,16 +241,16 @@ colnames(results) <- c("repeats","outcome","pace_linear","pace_linear2","pace_li
                        "avg_linear","avg_linear2","avg_linear3","pace_logit","pace_logit2",
                        "pace_logit3","pace_logit_lasso","pace_logit_lasso2","pace_logit_lasso3",
                        "avg_logit","avg_logit2","avg_logit3")
-results %>% write_csv("binary_rep_mixed_auc.csv",append = T)
+results %>% write_csv("binary_rep_mixed_auc.csv") #,append = T)
 
 FDRs <- do.call(rbind,FDRs)
 FDRs <- FDRs %>% as_tibble() 
 colnames(FDRs) <- c("repeats","outcome","pace_linear","pace_linear_lasso",
   "avg_linear","pace_logit","pace_logit_lasso","avg_logit")
-FDRs %>% write_csv("binary_rep_mixed_FDR.csv",append = T)
+FDRs %>% write_csv("binary_rep_mixed_FDR.csv") #,append = T)
 
 powers <- do.call(rbind,powers)
 powers <- powers %>% as_tibble() 
 colnames(powers) <- c("repeats","outcome","pace_linear","pace_linear_lasso",
   "avg_linear","pace_logit","pace_logit_lasso","avg_logit")
-powers %>% write_csv("binary_rep_mixed_power.csv",append = T)
+powers %>% write_csv("binary_rep_mixed_power.csv") #,append = T)

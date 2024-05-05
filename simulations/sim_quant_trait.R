@@ -199,16 +199,16 @@ colnames(results) <- c("repeats","outcome","pace_linear","pace_linear2","pace_li
                        "pace_linear_lasso","pace_linear_lasso2","pace_linear_lasso3",
                        "avg_linear","avg_linear2","avg_linear3","avg_linear_lasso",
                        "avg_linear_lasso2","avg_linear_lasso3")
-results %>% write_csv("quant_rep_mixed_auc.csv",append=T)
+results %>% write_csv("quant_rep_mixed_auc.csv") #,append=T)
 
 FDRs <- do.call(rbind,FDRs)
 FDRs <- FDRs %>% as_tibble() 
 colnames(FDRs) <- c("repeats","outcome","pace_linear",
                     "pace_linear_lasso","avg_linear","avg_linear_lasso")
-FDRs %>% write_csv("quant_rep_mixed_FDR.csv",append=T)
+FDRs %>% write_csv("quant_rep_mixed_FDR.csv") #,append=T)
 
 powers <- do.call(rbind,powers)
 powers <- powers %>% as_tibble() 
 colnames(powers) <- c("repeats","outcome","pace_linear","pace_linear_lasso",
                       "avg_linear","avg_linear_lasso")
-powers %>% write_csv("quant_rep_mixed_power.csv",append=T)
+powers %>% write_csv("quant_rep_mixed_power.csv") #,append=T)

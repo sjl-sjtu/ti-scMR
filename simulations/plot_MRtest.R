@@ -1,7 +1,7 @@
 library(tidyverse)
 library(ggsci)
 
-setwd("C:\\Users\\lenovo\\Desktop")
+setwd("/lustre/home/acct-clsyzs/clsyzs/SunJianle/singleCellMR/simulation/n18/true_genome/dyn_eqtl/mixed_sample")
 
 df <- read_csv("quant_rep_mixed_power.csv")
 df1 <- df %>% select(-repeats) %>% group_by(outcome) %>% 
@@ -21,7 +21,6 @@ p1 <- ggplot(df1,aes(outcome,power,fill=method))+
   scale_fill_aaas()+
   ylab("mean power")+
   xlab("outcome")
-dfp <- df1
 
 df <- read_csv("quant_rep_mixed_FDR.csv")
 df1 <- df %>% select(-repeats) %>% group_by(outcome) %>% summarise_at(vars(everything()),mean,na.rm=T)
@@ -38,10 +37,7 @@ p2 <- ggplot(df1,aes(outcome,FDR,fill=method))+
   scale_fill_aaas()+
   ylab("mean FDR")+
   xlab("outcome")
-dff <- df1
 
-df <- left_join(dff,dfp,by=c("outcome","method"))
-df %>% write_csv("quant.csv")
 
 df <- read_csv("binary_rep_mixed_power.csv")
 df1 <- df %>% select(-repeats) %>% group_by(outcome) %>% summarise_at(vars(everything()),mean)
@@ -59,7 +55,6 @@ p3 <- ggplot(df1,aes(outcome,power,fill=method))+
   scale_fill_aaas()+
   ylab("mean power")+
   xlab("outcome")
-dfp <- df1
 
 df <- read_csv("binary_rep_mixed_FDR.csv")
 df1 <- df %>% select(-repeats) %>% group_by(outcome) %>% summarise_at(vars(everything()),mean,na.rm=T)
@@ -78,10 +73,6 @@ p4 <- ggplot(df1,aes(outcome,FDR,fill=method))+
   scale_fill_aaas()+
   ylab("mean FDR")+
   xlab("outcome")
-dff <- df1
-
-df <- left_join(dff,dfp,by=c("outcome","method"))
-df %>% write_csv("binary.csv")
 
 library(patchwork)
 ((p2+p1)/(p4+p3))+plot_annotation(tag_levels = "a")

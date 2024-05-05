@@ -50,9 +50,9 @@ sim_qq <- function(path,name){
       y = "-log10(P-value), observed",
       title = name
     ) +
-    ylim(0, 80) +
+    coord_cartesian(ylim = c(0, 80)) +
     scale_x_continuous(breaks = seq(0,6)) +
-    geom_abline(intercept = 0, slope = 1, color = "black") +
+    geom_abline(intercept = 0, slope = 1, color = "black", linetype="dashed") +
     scale_color_lancet() +
     theme_clean() +
     theme(legend.position = c(0.05, 0.95),
@@ -105,9 +105,9 @@ true_qq <- function(path,name){
       y = "-log10(P-value), observed",
       title = name
     ) +
-    ylim(0, 80) +
+    coord_cartesian(ylim = c(0, 80)) +
     scale_x_continuous(breaks = seq(0,6)) +
-    geom_abline(intercept = 0, slope = 1, color = "black") +
+    geom_abline(intercept = 0, slope = 1, color = "black", linetype="dashed") +
     scale_color_lancet() +
     theme_clean() +
     theme(legend.position = c(0.05, 0.95),
