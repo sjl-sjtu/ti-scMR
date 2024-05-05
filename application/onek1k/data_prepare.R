@@ -2,12 +2,6 @@ library(data.table)
 library(tidyverse)
 setwd("/lustre/home/acct-clsyzs/clsyzs/SunJianle/singleCellMR/GSE196829/expression_matrix")
 
-
-idinfo <- map_dfc(unique(cum2$id), function(x) str_split(x,"_")[[1]])
-idinfo <- t(idinfo) |> as_tibble()
-colnames(idinfo) <- c("FID","IID")
-idinfo %>% write_delim("../genotype_chr/imputed/id_slt.txt",delim="\t")
-
 # cum_mat <- map_dfr(c("pace_cum_bm.csv","pace_cum_pl.csv"),fread)
 
 cum_mat <- fread("pace_cum_bm_bc.csv")
@@ -24,7 +18,10 @@ cum3$geneid <- colnames(cum2)[-1]
 cum3 <- cum3[,c("geneid",cum2$id),with=F]
 cum2$id[1:5]
 
-
+idinfo <- map_dfc(unique(cum2$id), function(x) str_split(x,"_")[[1]])
+idinfo <- t(idinfo) |> as_tibble()
+colnames(idinfo) <- c("FID","IID")
+idinfo %>% write_delim("../genotype_chr/imputed/id_slt.txt",delim="\t")
 
 id_order <- read_delim("/lustre/home/acct-clsyzs/clsyzs/SunJianle/singleCellMR/GSE196829/genotype_chr/imputed/slt_id_order.txt")
 #id_order <- id_order %>% rowwise()%>% mutate(id=paste(FID,IID,sep="_"))
