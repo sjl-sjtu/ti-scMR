@@ -17,7 +17,7 @@ loaded_packages <- search()[grepl("package:", search())]
 loaded_packages <- sub("package:", "", loaded_packages)
 
 markers <- fread("../Oligo_Ctr_MS_markers3.csv")
-genes <- markers[p_val_adj<0.05&abs(avg_log2FC)>0.8,gene]
+genes <- markers[p_val_adj<0.05&abs(avg_log2FC)>1,gene]
 
 seurat_ms_Oligo <- readRDS("../seurat_ms_Oligo_batch.rds")
 seurat_ctr_Oligo <- readRDS("../seurat_ctr_Oligo_batch.rds")
