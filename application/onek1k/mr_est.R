@@ -40,7 +40,7 @@ outcome <- "outcome"
 genes <- colnames(cum_mat)[-c(ncol(cum_mat)-1,ncol(cum_mat))]
 # genelist <- intersect(eqtl$GENE_ID|>unique(),genes)
 genelist <- genes
-outpath <- "results_b/pace_all_new4"
+outpath <- "results_b/pace_all_new3"
 
 stepPrune <- function(df,dfgwas,cutoff){
   snplist <- dfgwas %>% pull(snps)
