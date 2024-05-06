@@ -26,28 +26,9 @@ setnames(cum_mat,"sub","id")
 # colnames(snps)[-seq(1,6)] <- sapply(colnames(snps)[-seq(1,6)], function(x) strsplit(x, "_")[[1]][1])
 
 eqtl <- fread("../eqtl/eqtl_all_cis2.csv")%>%filter(pvalue<0.001)
-# eqtl1 <- fread("../eqtl/eqtl_all_trans.csv")%>%filter(FDR<0.01)
-# eqtl <- rbind(eqtl,eqtl1)
-# eqtl1 <- fread("../eqtl/eqtl_bm_cis.csv")
-# eqtl2 <- fread("../eqtl/eqtl_pl_cis.csv")
-# eqtl1 <- eqtl1[pvalue<0.001,]
-# eqtl2 <- eqtl2[pvalue<0.001,]
-# eqtl <- rbind(eqtl1,eqtl2)
+eqtl1 <- fread("../eqtl/eqtl_all_trans.csv")%>%filter(FDR<0.01)
+eqtl <- rbind(eqtl,eqtl1)
 
-# eqtl3 <- fread("../eqtl/eqtl_bm_trans.csv")
-# eqtl4 <- fread("../eqtl/eqtl_pl_trans.csv")
-# eqtl3 <- eqtl3[pvalue<0.001,]
-# eqtl4 <- eqtl4[pvalue<0.001,]
-# eqtl <- rbind(eqtl1,eqtl2,eqtl3,eqtl4)
-
-# eqtl <- eqtl %>% filter(CELL_TYPE%in%c("Plasma Cell","Naïve/Immature B Cell","Memory B Cell" ))
-# eqtl[,snp:=sapply(SNPID, function(x) strsplit(x, "_")[[1]][1])]
-# rsid <- eqtl$RSID[match(colnames(snps)[-seq(1,6)], eqtl$snp)]
-# colnames(snps)[-seq(1,6)] <- rsid
-# snps[,id:=paste(FID,IID,sep="_")]
-# ids <- intersect(cum_mat$id,snps$id)
-# cum_mat <- cum_mat[id %in% ids]
-# snps <- snps[id %in% ids]
 
 snps_all <- fread("../eqtl/SNP.txt")
 snps_all <- snps_all[IID%in%unique(eqtl$snps)]
@@ -59,7 +40,7 @@ outcome <- "outcome"
 genes <- colnames(cum_mat)[-c(ncol(cum_mat)-1,ncol(cum_mat))]
 # genelist <- intersect(eqtl$GENE_ID|>unique(),genes)
 genelist <- genes
-outpath <- "results_b/pace_cis_new4"
+outpath <- "results_b/pace_all_new4"
 
 stepPrune <- function(df,dfgwas,cutoff){
   snplist <- dfgwas %>% pull(snps)

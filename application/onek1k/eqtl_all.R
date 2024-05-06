@@ -102,8 +102,8 @@ cat('Detected distant eQTLs:', '\n');
 eqtl_cis <- me$cis$eqtls
 eqtl_trans <- me$trans$eqtls
 
-# eqtl_cis |> fwrite("eqtl_all_cis.csv")
-# eqtl_trans |> fwrite("eqtl_all_trans.csv")
+eqtl_cis |> fwrite("eqtl_all_cis.csv")
+eqtl_trans |> fwrite("eqtl_all_trans.csv")
 
 plot(me)
 
