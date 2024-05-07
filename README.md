@@ -3,7 +3,7 @@
 Trajectory-inference-based dynamic single-cell Mendelian randomization (ti-scMR)
 
 ## Tutorial
-Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using Seurat v5.
+Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5.
 ```R
 library(Seurat)
 seurat_obj <- readRDS("example_sc.rds")
@@ -34,6 +34,10 @@ seurat_obj <- ScaleData(seurat_obj)
 
 # Clustering
 
+```
+
+We chose cells of type A, and conducted trajectory inference via `slingshot`
+```R
 # Trajectory inference
 library(SingleCellExperiment)
 library(slingshot)
@@ -42,4 +46,18 @@ library(scran)
 library(bluster)
 sce <- as.SingleCellExperiment(seurat_A)
 sce <- slingshot(sce,reducedDim="UMAP")
+```
+
+We got candidate genes via differential expression analysis
+```R
+# DE
+seurat_Oligo <- SetIdent(seurat_Oligo,value="outcome")
+DefaultAssay(seurat_Oligo) <- "RNA" 
+markers <- FindMarkers(seurat_Oligo, ident.1 = "Control", ident.2 = "MS")
+markers %>% rownames_to_column(var = "gene") %>% as_tibble() %>% write_csv("Oligo_Ctr_MS_markers.csv")
+```
+
+We calculated the cumulative expression effects via PACE
+```R
+# first
 ```
