@@ -48,7 +48,7 @@ sce <- as.SingleCellExperiment(seurat_A)
 sce <- slingshot(sce,reducedDim="UMAP")
 ```
 
-We got candidate genes via differential expression analysis
+Get candidate genes via differential expression analysis
 ```R
 # DE
 seurat_Oligo <- SetIdent(seurat_Oligo,value="outcome")
@@ -57,7 +57,16 @@ markers <- FindMarkers(seurat_Oligo, ident.1 = "Control", ident.2 = "MS")
 markers %>% rownames_to_column(var = "gene") %>% as_tibble() %>% write_csv("Oligo_Ctr_MS_markers.csv")
 ```
 
-We calculated the cumulative expression effects via PACE
+Caculate the cumulative expression effects via PACE
 ```R
 # first
 ```
+
+Prepare data for eQTL. For this simulated dataset, we do not specify the locations of genes and SNPs.
+```R
+library(data.table)
+library(tidyverse)
+cum_mat <- fread("pace_cum.csv")
+```
+
+Conduct eQTL mapping
