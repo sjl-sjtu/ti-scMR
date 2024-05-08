@@ -8,7 +8,10 @@ The package can be installed by
 ## Tutorial
 Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5.
 ```R
+library(data.table)
+library(tidyverse)
 library(Seurat)
+
 seurat_obj <- readRDS("example_sc.rds")
 
 # Quality Control
@@ -23,20 +26,24 @@ seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize")
 # High variable features
 seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = "vst", nfeatures = 3000)
 
+# Scaling
+seurat_obj <- ScaleData(seurat_obj)
+
+# PCA
+seurat_obj <- RunPCA(seurat_obj)
+
 # Batch correction
 library(harmony)
 seurat_obj <- RunHarmony(seurat_obj,"id")
 
 # Dimension reduction
-seurat_obj <- seurat_obj %>% RunUMAP(reduction="harmony",dims=1:20) %>%
+seurat_obj <- seurat_obj %>% RunUMAP(reduction="harmony",dims=1:10) %>%
   FindNeighbors(reduction="harmony",dims=1:20)%>%
   FindClusters(resolution = 0.5)
 
-# Scaling
-seurat_obj <- ScaleData(seurat_obj)
-
 # Clustering
-
+seurat_obj <- FindNeighbors(seurat_obj , dims = 1:10)
+seurat_obj <- FindClusters(seurat_obj , resolution = 0.5)
 ```
 
 We chose cells of type A, and conducted trajectory inference via `slingshot`
