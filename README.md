@@ -54,20 +54,21 @@ We chose cells of type A, and conducted trajectory inference via `slingshot`
 # Trajectory inference
 library(SingleCellExperiment)
 library(slingshot)
-library(scater)
-library(scran)
-library(bluster)
 sce <- as.SingleCellExperiment(seurat_A)
 sce <- slingshot(sce,reducedDim="UMAP")
+df <- sce@colData
+df$slingshot <- NULL
+df <- as.data.table(df,keep.rownames = T) 
+df %>% fwrite("ms_ti.csv")
 ```
 
 Get candidate genes via differential expression analysis
 ```R
 # DE
-seurat_Oligo <- SetIdent(seurat_Oligo,value="outcome")
-DefaultAssay(seurat_Oligo) <- "RNA" 
-markers <- FindMarkers(seurat_Oligo, ident.1 = "Control", ident.2 = "MS")
-markers %>% rownames_to_column(var = "gene") %>% as_tibble() %>% write_csv("Oligo_Ctr_MS_markers.csv")
+seurat_A <- SetIdent(seurat_A,value="disease")
+DefaultAssay(seurat_A) <- "RNA" 
+markers <- FindMarkers(seurat_A, ident.1 = 0, ident.2 = 1)
+markers %>% rownames_to_column(var = "gene") %>% as_tibble() %>% write_csv("MS_markers.csv")
 ```
 
 Caculate the cumulative expression effects via PACE
