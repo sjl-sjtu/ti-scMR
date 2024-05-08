@@ -46,7 +46,7 @@ seurat_obj <- FindClusters(seurat_obj , resolution = 0.5)
 # Subset
 SetIdent(seurat_obj,value="seurat_clusters")
 UMAPPlot(seurat_obj)
-seurat_obj_A <- subset(seurat_obj,idents = 0)
+seurat_A <- subset(seurat_obj,idents = 0)
 ```
 
 We chose cells of type A, and conducted trajectory inference via `slingshot`
