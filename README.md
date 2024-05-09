@@ -75,19 +75,19 @@ markers %>% write_csv("example_markers.csv")
 
 Caculate the cumulative expression effects via PACE
 ```R
-# first extract the observed RNA abundance
-df <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
-df$cellid <- colnames(seurat_A)
-df <- df %>% left_join(seurat_A@meta.data,by="cellid") %>%
+# first extract the processed RNA abundance levels
+df_rna <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
+df_rna$cellid <- colnames(seurat_A)
+df_rna <- df_rna %>% left_join(seurat_A@meta.data,by="cellid") %>%
   dplyr::select(id,cellid,any_of(genelist),disease) %>% 
   left_join(dfti[,.(cellid,slingPseudotime_1)],by="cellid")
 
 # transfer pseudotime points to time period (by )
-df <- df %>% mutate(pseudotime=round(slingPseudotime_1))
-df %>% write_csv("express.csv")
+df_rna <- df_rna %>% mutate(pseudotime=round(slingPseudotime_1))
+df_rna %>% write_csv("express.csv")
 
 # restore the cumulative effects
-df_cum <- cum_expression(df,genelist,id_var="id",pseudotime_var="pseudotime")
+df_cum <- cum_expression(df_rna,genelist,id_var="id",pseudotime_var="pseudotime")
 df_cum %>% write_csv("pace_cum.csv")
 ```
 
@@ -112,3 +112,14 @@ snp %>% fwrite("SNP.txt",row.names=FALSE,sep=" ")
 ```
 
 Conduct eQTL mapping
+```R
+# using MatrixEQTL tools
+
+eqtl %>% write_csv("eqtl_pace.csv")
+```
+
+We finally conducted MR analysis
+```R
+# IV
+
+```
