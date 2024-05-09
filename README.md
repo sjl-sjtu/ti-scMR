@@ -91,8 +91,9 @@ df_cum <- cum_expression(df_rna,genelist,id_var="id",pseudotime_var="pseudotime"
 df_cum %>% write_csv("pace_cum.csv")
 ```
 
-Prepare data for eQTL. For this simulated dataset, we do not specify the locations of genes and SNPs.
+Prepare data for eQTL. For this simulated dataset, we do not specify the locations of genes and SNPs, and we do not include any covariates (like genomic PCs). Please check requirments of data format for package `MatrixEQTL` if you want to add these information in real data analysis.
 ```R
+# Gene expression data
 df <- fread("pace_cum.csv")
 gene <- t(df[,genelist,with=F])
 colnames(gene) <- df$id
@@ -101,6 +102,7 @@ gene$geneid <- genelist
 gene <- gene[,c("geneid",df$id),with=FALSE]
 gene %>% write_delim("GE_pace.txt")
 
+# Genotype data
 dat <- fread("genotypes.csv")
 snplist <- setdiff(colnames(snps),"id")
 snp <- t(dat[,snplist,with=FALSE])
@@ -109,6 +111,8 @@ snp <- as.data.table(snp)
 snp[,snpid:= snplist]
 snp <- snp[,c("snpid",df$id),with=F]
 snp %>% fwrite("SNP.txt",row.names=FALSE,sep=" ")
+
+# We do not consider covariates and locations of SNPs and genes in this toy example.
 ```
 
 Conduct eQTL mapping
