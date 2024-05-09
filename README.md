@@ -56,10 +56,10 @@ library(SingleCellExperiment)
 library(slingshot)
 sce <- as.SingleCellExperiment(seurat_A)
 sce <- slingshot(sce,reducedDim="UMAP")
-df <- sce@colData
-df$slingshot <- NULL
-df <- as.data.table(df,keep.rownames = T) 
-df %>% fwrite("ms_ti.csv")
+dfti <- sce@colData
+dfti$slingshot <- NULL
+dfti <- as.data.table(dfti,keep.rownames = T) 
+dfti %>% fwrite("example_ti.csv")
 ```
 
 Get candidate genes via differential expression analysis
@@ -68,19 +68,47 @@ Get candidate genes via differential expression analysis
 seurat_A <- SetIdent(seurat_A,value="disease")
 DefaultAssay(seurat_A) <- "RNA" 
 markers <- FindMarkers(seurat_A, ident.1 = 0, ident.2 = 1)
-markers %>% rownames_to_column(var = "gene") %>% as_tibble() %>% write_csv("MS_markers.csv")
+markers <- markers %>% rownames_to_column(var = "gene") %>% as_tibble()
+genelist <- markers%>%filter(p_val_adj<0.05)%>%pull(gene)
+markers %>% write_csv("example_markers.csv")
 ```
 
 Caculate the cumulative expression effects via PACE
 ```R
-# first
+# first extract the observed RNA abundance
+df <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
+df$cellid <- colnames(seurat_A)
+df <- df %>% left_join(seurat_A@meta.data,by="cellid") %>%
+  dplyr::select(id,cellid,any_of(genelist),disease) %>% 
+  left_join(dfti[,.(cellid,slingPseudotime_1)],by="cellid")
+
+# transfer pseudotime points to time period (by )
+df <- df %>% mutate(pseudotime=round(slingPseudotime_1))
+df %>% write_csv("express.csv")
+
+# restore the cumulative effects
+df_cum <- cum_expression(df,genelist,id_var="id",pseudotime_var="pseudotime")
+df_cum %>% write_csv("pace_cum.csv")
 ```
 
 Prepare data for eQTL. For this simulated dataset, we do not specify the locations of genes and SNPs.
 ```R
-library(data.table)
-library(tidyverse)
-cum_mat <- fread("pace_cum.csv")
+df <- fread("pace_cum.csv")
+gene <- t(df[,genelist,with=F])
+colnames(gene) <- df$id
+gene <- as.data.table(gene)
+gene$geneid <- genelist
+gene <- gene[,c("geneid",df$id),with=FALSE]
+gene %>% write_delim("GE_pace.txt")
+
+dat <- fread("genotypes.csv")
+snplist <- setdiff(colnames(snps),"id")
+snp <- t(dat[,snplist,with=FALSE])
+colnames(snp) <- df$id
+snp <- as.data.table(snp)
+snp[,snpid:= snplist]
+snp <- snp[,c("snpid",df$id),with=F]
+snp %>% fwrite("SNP.txt",row.names=FALSE,sep=" ")
 ```
 
 Conduct eQTL mapping
