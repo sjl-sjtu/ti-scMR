@@ -125,10 +125,69 @@ covs %>% fwrite("Covariates.txt",row.names=FALSE,sep=" ")
 # We do not consider locations of SNPs and genes in this toy example.
 ```
 
-Conduct eQTL mapping
+Conduct eQTL mapping. Please refer MatrixEQTL (<https://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/runit.html>) for more tutorials, including conducting *cis*- and *trans*-eQTL mapping separately.
 ```R
 # using MatrixEQTL tools
+library(MatrixEQTL)
 
+base.dir = getwd()
+useModel = modelLINEAR 
+SNP_file_name = paste(base.dir, "/SNP.txt", sep="") 
+expression_file_name = paste(base.dir, "/GE_pace.txt", sep="") 
+covariates_file_name = paste(base.dir, "/Covariates.txt", sep="")
+output_file_name = tempfile() 
+pvOutputThreshold = 1e-4 
+errorCovariance = numeric() 
+
+snps = SlicedData$new() 
+snps$fileDelimiter = " "       
+snps$fileOmitCharacters = "NA" 
+snps$fileSkipRows = 1        
+snps$fileSkipColumns = 1     
+snps$fileSliceSize = 2000      
+snps$LoadFile( SNP_file_name ) 
+
+gene = SlicedData$new()
+gene$fileDelimiter = " " 
+gene$fileOmitCharacters = "NA"
+gene$fileSkipRows = 1
+gene$fileSkipColumns = 1
+gene$fileSliceSize = 2000
+gene$LoadFile(expression_file_name)
+
+cvrt = SlicedData$new();
+cvrt$fileDelimiter = " "; 
+cvrt$fileOmitCharacters = "NA";
+cvrt$fileSkipRows = 1;  
+cvrt$fileSkipColumns = 1; 
+if(length(covariates_file_name)>0) {
+  cvrt$LoadFile(covariates_file_name);
+}
+
+
+maf.list = vector('list', length(snps))
+for(sl in 1:length(snps)) {
+  slice = snps[[sl]];
+  maf.list[[sl]] = rowMeans(slice,na.rm=TRUE)/2;
+  maf.list[[sl]] = pmin(maf.list[[sl]],1-maf.list[[sl]]);
+}
+maf = unlist(maf.list)
+snps$RowReorder(maf>=0.01);
+
+me = Matrix_eQTL_engine(
+  snps = snps,
+  gene = gene,
+  cvrt = cvrt,
+  output_file_name = output_file_name, 
+  pvOutputThreshold = pvOutputThreshold,
+  useModel = useModel,
+  errorCovariance = errorCovariance,
+  verbose = TRUE,
+  min.pv.by.genesnp = FALSE,  pvalue.hist = "qqplot",
+  noFDRsaveMemory = FALSE)
+
+eqtl <- me$all$eqtls
+eqtl$gene |> unique() %>% length()
 eqtl %>% write_csv("eqtl_pace.csv")
 ```
 
