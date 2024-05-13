@@ -6,7 +6,7 @@ Trajectory-inference-based dynamic single-cell Mendelian randomization (ti-scMR)
 The package can be installed by
 
 ## Tutorial
-Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5.
+Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5 (<https://satijalab.org/seurat/>).
 ```R
 library(data.table)
 library(tidyverse)
@@ -49,7 +49,7 @@ UMAPPlot(seurat_obj)
 seurat_A <- subset(seurat_obj,idents = 0)
 ```
 
-We chose cells of type A, and conducted trajectory inference via `slingshot`
+We chose cells of type A, and conducted trajectory inference via `slingshot` (<https://nbisweden.github.io/workshop-archive/workshop-scRNAseq/2020-01-27/labs/compiled/slingshot/slingshot.html>)
 ```R
 # Trajectory inference
 library(SingleCellExperiment)
@@ -73,7 +73,7 @@ genelist <- markers%>%filter(p_val_adj<0.05)%>%pull(gene)
 markers %>% write_csv("example_markers.csv")
 ```
 
-Caculate the cumulative expression effects via PACE
+Caculate the cumulative expression effects via PACE. We provide a function `cum_expression` to calculate cumulative effects of all candidate genes, which is implemented based on R package `fdapace` (<https://cran.r-project.org/web/packages/fdapace/vignettes/fdapaceVig.html>).
 ```R
 # first extract the processed RNA abundance levels
 df_rna <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
@@ -125,7 +125,7 @@ covs %>% fwrite("Covariates.txt",row.names=FALSE,sep=" ")
 # We do not consider locations of SNPs and genes in this toy example.
 ```
 
-Conduct eQTL mapping. Please refer MatrixEQTL (<https://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/runit.html>) for more tutorials, including conducting *cis*- and *trans*-eQTL mapping separately.
+Conduct eQTL mapping. Please refer `MatrixEQTL` (<https://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/runit.html>) for more tutorials, including conducting *cis*- and *trans*-eQTL mapping separately.
 ```R
 # using MatrixEQTL tools
 library(MatrixEQTL)
