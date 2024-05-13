@@ -82,7 +82,7 @@ df_rna <- df_rna %>% left_join(seurat_A@meta.data,by="cellid") %>%
   dplyr::select(id,cellid,any_of(genelist),disease) %>% 
   left_join(dfti[,.(cellid,slingPseudotime_1)],by="cellid")
 
-# transfer pseudotime points to time period (by )
+# transfer pseudotime points to time period (by rounding the pseudotime)
 df_rna <- df_rna %>% mutate(pseudotime=round(slingPseudotime_1))
 df_rna %>% write_csv("express.csv")
 
