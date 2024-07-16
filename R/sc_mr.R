@@ -1,4 +1,4 @@
-sc_mr <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL){
+sc_mr <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL,bootstraps=5000){
   library(tidyverse)
   library(data.table)
   library(sandwich)
@@ -84,7 +84,7 @@ sc_mr <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL){
     )
   }
 
-  MR_pace_lasso_logit <- function(geneName,repeats=5000){
+  MR_pace_lasso_logit <- function(geneName,repeats=bootstraps){
     tryCatch(
       {   
         formu <- as.formula(paste(geneName,"~",paste(IV,collapse="+")))
@@ -129,7 +129,7 @@ sc_mr <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL){
     )
   }
 
-  MR_pace_lasso_linear <- function(geneName,repeats=5000){
+  MR_pace_lasso_linear <- function(geneName,repeats=bootstraps){
     tryCatch(
       {
         formu <- as.formula(paste(geneName,"~",paste(IV,collapse="+")))
