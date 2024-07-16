@@ -1,4 +1,4 @@
-scMR <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL){
+sc_mr <- function(df,geneName,outcome,IV,method="linear",id_var="id",covs=NULL){
   library(tidyverse)
   library(data.table)
   library(sandwich)
