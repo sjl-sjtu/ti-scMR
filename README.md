@@ -210,17 +210,9 @@ library(pROC)
 library(boot)
 library(boot.pval)
 
-snps <- fread("../geno.csv")
-ge <- fread("sim_sc_scale.csv")
+snps <- fread("genotypes.csv")
+cum_mat <- fread("pace_cum.csv")
 eqtl <- fread("eqtl_pace.csv")[FDR<0.05,]
-exposureDat0 <- read_csv("exposureDat.csv")
-cum_mat0 <- read_csv("pace_cum.csv")
-timeLength <- 20
-p <- 10000 #genome size
-n <- 500 #sample size
-g <- 100 #gene num
-t <- 20 #total time
-genelist <- paste0("gene",1:g)
 
 label <- as_tibble(cbind(label,labels))
 exposureDat <- exposureDat0 %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
@@ -245,5 +237,6 @@ res <- foreach(geneName = genelist,.packages = loaded_packages) %dopar% {
     res %>% write_csv(paste0("quant_rep/pace_linear_lasso_",outcome,"_",r,".csv"))
 
 # IV
+
 
 ```
