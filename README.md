@@ -78,6 +78,8 @@ Caculate the cumulative expression effects via PACE. We provide a function `cum_
 # first extract the processed RNA abundance levels
 df_rna <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
 df_rna$cellid <- colnames(seurat_A)
+
+# combine with cell information
 df_rna <- df_rna %>% left_join(seurat_A@meta.data,by="cellid") %>%
   dplyr::select(id,cellid,any_of(genelist),disease) %>% 
   left_join(dfti[,.(cellid,slingPseudotime_1)],by="cellid")
@@ -209,34 +211,48 @@ library(glmnet)
 library(pROC)
 library(boot)
 library(boot.pval)
+source("sc_mr.R")
+
+loaded_packages <- search()[grepl("package:", search())]
+loaded_packages <- sub("package:", "", loaded_packages)
 
 snps <- fread("genotypes.csv")
 cum_mat <- fread("pace_cum.csv")
 eqtl <- fread("eqtl_pace.csv")[FDR<0.05,]
 
-label <- as_tibble(cbind(label,labels))
-exposureDat <- exposureDat0 %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
-cum_mat <- cum_mat0 %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
-
-source("scMR.R")
-
-loaded_packages <- search()[grepl("package:", search())]
-loaded_packages <- sub("package:", "", loaded_packages)
+# LD pruning of IVs
+stepPrune <- function(df,dfgwas,cutoff){
+  snplist <- dfgwas %>% pull(snps)
+  candidate <- c()
+  while(length(snplist)>0){
+    dfgwas <- dfgwas%>%filter(snps %in% snplist)
+    j <- dfgwas[which.min(dfgwas$FDR),"snps"] %>% as.character()
+    candidate <- c(candidate,j)
+    snplist <- setdiff(snplist,j)
+    calcLD <- function(i,j,df){
+      return(cor(df%>%pull(i),df%>%pull(j))^2)  # Rogers and Huff (2008)
+    }
+    LDs <- sapply(snplist,calcLD,j,df) 
+    snplist <- snplist[which(LDs<cutoff)]
+  }
+  return(candidate)
+}
 
 res <- foreach(geneName = genelist,.packages = loaded_packages) %dopar% {
       MR_pace_lasso_linear(geneName, repeats = 5000)
+      outcome <- "disease"
+      IV <- eqtl %>% filter(gene==geneName) %>% filter(FDR<0.05) %>% pull(snps)
+      dfex <- cum_mat %>% left_join(snps %>% select_at(vars(any_of(IV))), by="id")
+      if(length(IV)>0){
+        dfgwas <- eqtl %>% filter(gene==geneName) %>% mutate(snps=make.names(snps)) %>% filter(snps %in% IV) %>% select(snps,FDR)
+        IV <- stepPrune(dfex,dfgwas,0.1)
+      }
+      return(sc_mr(dfex,geneName,outcome,IV,method="logit_lasso",id_var="id",bootstraps=5000))
     }
-    res <- reduce(res,rbind)
-    colnames(res) <- c("IVnum","F","beta","ci_l","ci_u","se","p")
-    res <- as_tibble(res)
-    res$gene <- genelist
-    res$label <- label%>%pull(any_of(outcome))
-    res$padj <- p.adjust(res$p,method = "BH")
-    res$p[res$p == 0] <- 1e-16
-    res$padj[res$padj == 0] <- 1e-16
-    res %>% write_csv(paste0("quant_rep/pace_linear_lasso_",outcome,"_",r,".csv"))
-
-# IV
-
-
+res <- reduce(res,rbind)
+colnames(res) <- c("IVnum","F","beta","ci_l","ci_u","se","p")
+res <- as_tibble(res)
+res$gene <- genelist
+res$padj <- p.adjust(res$p,method = "BH")
+res %>% write_csv("results.csv")
 ```
