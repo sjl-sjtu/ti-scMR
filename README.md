@@ -243,7 +243,7 @@ res <- foreach(geneName = genelist,.packages = loaded_packages) %dopar% {
       IV <- eqtl %>% filter(gene==geneName) %>% filter(FDR<0.05) %>% pull(snps)
       dfex <- cum_mat %>% left_join(snps %>% select_at(vars(any_of(IV))), by="id")
       if(length(IV)>0){
-        dfgwas <- eqtl %>% filter(gene==geneName) %>% mutate(snps=make.names(snps)) %>% filter(snps %in% IV) %>% select(snps,FDR)
+        dfgwas <- eqtl %>% filter(gene==geneName) %>% filter(snps %in% IV) %>% select(snps,FDR)
         IV <- stepPrune(dfex,dfgwas,0.1)
       }
       return(sc_mr(dfex,geneName,outcome,IV,method="logit_lasso",id_var="id",bootstraps=5000))
