@@ -193,6 +193,57 @@ eqtl %>% write_csv("eqtl_pace.csv")
 
 We finally conducted MR analysis
 ```R
+library(doParallel)
+library(foreach)
+registerDoParallel(40)
+getDoParWorkers()
+
+library(fdapace)
+library(tidyverse)
+library(data.table)
+library(pracma)
+library(sandwich)
+library(aod)
+library(ivreg)
+library(glmnet)
+library(pROC)
+library(boot)
+library(boot.pval)
+
+snps <- fread("../geno.csv")
+ge <- fread("sim_sc_scale.csv")
+eqtl <- fread("eqtl_pace.csv")[FDR<0.05,]
+exposureDat0 <- read_csv("exposureDat.csv")
+cum_mat0 <- read_csv("pace_cum.csv")
+timeLength <- 20
+p <- 10000 #genome size
+n <- 500 #sample size
+g <- 100 #gene num
+t <- 20 #total time
+genelist <- paste0("gene",1:g)
+
+label <- as_tibble(cbind(label,labels))
+exposureDat <- exposureDat0 %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
+cum_mat <- cum_mat0 %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
+
+source("scMR.R")
+
+loaded_packages <- search()[grepl("package:", search())]
+loaded_packages <- sub("package:", "", loaded_packages)
+
+res <- foreach(geneName = genelist,.packages = loaded_packages) %dopar% {
+      MR_pace_lasso_linear(geneName, repeats = 5000)
+    }
+    res <- reduce(res,rbind)
+    colnames(res) <- c("IVnum","F","beta","ci_l","ci_u","se","p")
+    res <- as_tibble(res)
+    res$gene <- genelist
+    res$label <- label%>%pull(any_of(outcome))
+    res$padj <- p.adjust(res$p,method = "BH")
+    res$p[res$p == 0] <- 1e-16
+    res$padj[res$padj == 0] <- 1e-16
+    res %>% write_csv(paste0("quant_rep/pace_linear_lasso_",outcome,"_",r,".csv"))
+
 # IV
 
 ```
