@@ -239,7 +239,6 @@ stepPrune <- function(df,dfgwas,cutoff){
 }
 
 res <- foreach(geneName = genelist,.packages = loaded_packages) %dopar% {
-      MR_pace_lasso_linear(geneName, repeats = 5000)
       outcome <- "disease"
       IV <- eqtl %>% filter(gene==geneName) %>% filter(FDR<0.05) %>% pull(snps)
       dfex <- cum_mat %>% left_join(snps %>% select_at(vars(any_of(IV))), by="id")
