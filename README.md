@@ -89,6 +89,7 @@ df_rna <- df_rna %>% mutate(pseudotime=round(slingPseudotime_1))
 df_rna %>% write_csv("express.csv")
 
 # restore the cumulative effects
+source("cum_expression.R")
 df_cum <- cum_expression(df_rna,genelist,id_var="id",pseudotime_var="pseudotime")
 df_cum %>% write_csv("pace_cum.csv")
 ```
@@ -193,7 +194,7 @@ eqtl$gene |> unique() %>% length()
 eqtl %>% write_csv("eqtl_pace.csv")
 ```
 
-We finally conducted MR analysis
+We finally conducted MR analysis. We provide an R function `sc_mr` to conduct single-cell Mendelian randomization.
 ```R
 library(doParallel)
 library(foreach)
@@ -211,6 +212,7 @@ library(glmnet)
 library(pROC)
 library(boot)
 library(boot.pval)
+
 source("sc_mr.R")
 
 loaded_packages <- search()[grepl("package:", search())]
