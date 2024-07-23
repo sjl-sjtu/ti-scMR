@@ -2,9 +2,6 @@
 
 Trajectory-inference-based dynamic single-cell Mendelian randomization (ti-scMR)
 
-## Installation
-The package can be installed by
-
 ## Tutorial
 Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5 (<https://satijalab.org/seurat/>).
 ```R
@@ -73,7 +70,7 @@ genelist <- markers%>%filter(p_val_adj<0.05)%>%pull(gene)
 markers %>% write_csv("example_markers.csv")
 ```
 
-Caculate the cumulative expression effects via PACE. We provide a function `cum_expression` to calculate cumulative effects of all candidate genes, which is implemented based on R package `fdapace` (<https://cran.r-project.org/web/packages/fdapace/vignettes/fdapaceVig.html>).
+Caculate the cumulative expression effects via PACE. We provide a function `cum_expression` (<https://github.com/sjl-sjtu/ti-scMR/blob/main/R/cum_expression.R>) to calculate cumulative effects of all candidate genes, which is implemented based on R package `fdapace` (<https://cran.r-project.org/web/packages/fdapace/vignettes/fdapaceVig.html>).
 ```R
 # first extract the processed RNA abundance levels
 df_rna <- seurat_A@assays$RNA$scale.data %>% t() %>% as_tibble()
@@ -194,7 +191,7 @@ eqtl$gene |> unique() %>% length()
 eqtl %>% write_csv("eqtl_pace.csv")
 ```
 
-We finally conducted MR analysis. We provide an R function `sc_mr` to conduct single-cell Mendelian randomization.
+We finally conducted MR analysis. We provide an R function `sc_mr` (<https://github.com/sjl-sjtu/ti-scMR/blob/main/R/sc_mr.R>) to conduct single-cell Mendelian randomization.
 ```R
 library(doParallel)
 library(foreach)
