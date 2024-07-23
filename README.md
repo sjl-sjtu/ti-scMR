@@ -2,7 +2,9 @@
 
 Trajectory-inference-based dynamic single-cell Mendelian randomization (ti-scMR)
 
-![](https://github.com/sjl-sjtu/ti-scMR/blob/main/Figs/ti-scMR.pdf)
+![](https://github.com/sjl-sjtu/ti-scMR/blob/main/Figs/ti-scMR.jpg)
+
+![](https://github.com/sjl-sjtu/ti-scMR/blob/main/Figs/flowchart.jpg)
 
 ## Tutorial
 Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. We first process the sc-RNA count matrix using `Seurat` v5 (<https://satijalab.org/seurat/>).
