@@ -131,7 +131,7 @@ covs %>% fwrite("Covariates.txt",row.names=FALSE,sep=" ")
 # We do not consider locations of SNPs and genes in this toy example.
 ```
 
-Conduct eQTL mapping. Please refer `MatrixEQTL` (<https://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/runit.html>) for more tutorials, including conducting *cis*- and *trans*-eQTL mapping separately.
+Conduct eQTL mapping. If you have location information for genes and SNPs, it is recommended to conduct *cis*- and *trans*-eQTL mapping separately. Please refer `MatrixEQTL` (<https://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/runit.html>) for more tutorials.
 ```R
 # using MatrixEQTL tools
 library(MatrixEQTL)
