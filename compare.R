@@ -56,8 +56,7 @@ X <- ge %>% group_by(id) %>%
   as.matrix()
 gene <- colnames(X)
 
-out <- fread("../phenotypes_quant.csv")
-# dfiv <- fread("../dfiv.csv")
+out <- fread("../phenotypes_logit.csv")
 label <- read_csv("../label.csv")
 
 outcomes <- paste0("Y",1:4)
@@ -107,25 +106,61 @@ res4 <- GIFT_individual(X, Y, Z, Z, gene, pindex,
                         ncores=4, filter=T)
 res4$label <- label$Y4
 
-FDR1 <- nrow(res1%>%filter(p<0.05)%>%filter(label==0))/nrow(res1%>%filter(p<0.05))
-power1 <- nrow(res1%>%filter(label==1)%>%filter(p<0.05))/nrow(res1%>%filter(label==1))
-FDR2 <- nrow(res2%>%filter(p<0.05)%>%filter(label==0))/nrow(res2%>%filter(p<0.05))
-power2 <- nrow(res2%>%filter(label==1)%>%filter(p<0.05))/nrow(res2%>%filter(label==1))
-FDR3 <- nrow(res3%>%filter(p<0.05)%>%filter(label==0))/nrow(res3%>%filter(p<0.05))
-power3 <- nrow(res3%>%filter(label==1)%>%filter(p<0.05))/nrow(res3%>%filter(label==1))
-FDR4 <- nrow(res4%>%filter(p<0.05)%>%filter(label==0))/nrow(res4%>%filter(p<0.05))
-power4 <- nrow(res4%>%filter(label==1)%>%filter(p<0.05))/nrow(res4%>%filter(label==1))
+library(tidyverse)
+res1 <- read_csv("gift_y1.csv")
+res1$p_adj <- p.adjust(res1$p, method = "BH")
+FDR1 <- nrow(res1%>%filter(p_adj<0.05)%>%filter(label==0))/nrow(res1%>%filter(p_adj<0.05))
+power1 <- nrow(res1%>%filter(label==1)%>%filter(p_adj<0.05))/nrow(res1%>%filter(label==1))
 
-tibble(FDR=c(FDR1,FDR2,FDR3,FDR4),power=c(power1,power2,power3,power4)) %>% write_csv("GIFT_results_binary.csv")
+res2 <- read_csv("gift_y2.csv")
+res2$p_adj <- p.adjust(res2$p, method = "BH")
+FDR2 <- nrow(res2%>%filter(p_adj<0.05)%>%filter(label==0))/nrow(res2%>%filter(p_adj<0.05))
+power2 <- nrow(res2%>%filter(label==1)%>%filter(p_adj<0.05))/nrow(res2%>%filter(label==1))
 
+res3 <- read_csv("gift_y3.csv")
+res3$p_adj <- p.adjust(res3$p, method = "BH")
+FDR3 <- nrow(res3%>%filter(p_adj<0.05)%>%filter(label==0))/nrow(res3%>%filter(p_adj<0.05))
+power3 <- nrow(res3%>%filter(label==1)%>%filter(p_adj<0.05))/nrow(res3%>%filter(label==1))
 
-# eqtl <- fread("eqtl_pace.csv")[FDR<0.01,]
-# timeLength <- 20
-# g <- 500
-# genelist <- paste0("gene",1:g)
-# outcomes <- paste0("Y",1:4)
-# exposureDat <- read_csv("exposureDat.csv")
-# cum_mat <- read_csv("pace_cum.csv")
-# exposureDat <- exposureDat %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
-# cum_mat <- cum_mat %>% left_join(out%>%dplyr::select(id,any_of(outcomes)),by="id")
+res4 <- read_csv("gift_y4.csv")
+res4$p_adj <- p.adjust(res4$p, method = "BH")
+FDR4 <- nrow(res4%>%filter(p_adj<0.05)%>%filter(label==0))/nrow(res4%>%filter(p_adj<0.05))
+power4 <- nrow(res4%>%filter(label==1)%>%filter(p_adj<0.05))/nrow(res4%>%filter(label==1))
+
+gift <- tibble(FDR=c(FDR1,FDR2,FDR3,FDR4),power=c(power1,power2,power3,power4))
+de <- read_csv("DE_results_binary.csv")
+tisc1 <- read_csv("binary_rep_mixed_FDR.csv")
+tisc1 <- tisc1 %>% group_by(outcome) %>% summarise_all(mean,na.rm=T) %>% 
+  dplyr::select(outcome,avg_linear,pace_linear_lasso)
+tisc2 <- read_csv("binary_rep_mixed_power.csv")
+tisc2 <- tisc2 %>% group_by(outcome) %>% summarise_all(mean,na.rm=T) %>% 
+  dplyr::select(outcome,avg_linear,pace_linear_lasso)
+colnames(tisc1) <- c("outcome","vanilla scMR","ti-scMR")
+colnames(tisc2) <- c("outcome","vanilla scMR","ti-scMR")
+tisc1$DE <- de$FDR
+tisc2$DE <- de$FDR
+tisc1$GIFT <- gift$FDR
+tisc2$GIFT <- gift$power
+tisc1 <- tisc1 %>% pivot_longer(cols=2:5, names_to = "Method", values_to = "FDR")
+tisc2 <- tisc2 %>% pivot_longer(cols=2:5, names_to = "Method", values_to = "Power")
+
+tisc1$Method <- factor(tisc1$Method, levels = c("DE","GIFT","vanilla scMR","ti-scMR"))
+tisc2$Method <- factor(tisc2$Method, levels = c("DE","GIFT","vanilla scMR","ti-scMR"))
+library(ggthemes)
+library(ggsci)
+g1 <- ggplot(tisc1)+
+  geom_bar(aes(outcome,FDR,fill = Method),stat="identity",position='dodge',colour="black")+
+  theme_classic()+
+  ggtitle("False Discovery Rate")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_fill_aaas(alpha=0.6)
+g2 <- ggplot(tisc2)+
+  geom_bar(aes(outcome,Power,fill = Method),stat="identity",position='dodge',colour="black")+
+  theme_classic()+
+  ggtitle("Power")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_fill_aaas(alpha=0.6)
+library(patchwork)
+g1+g2
+
 
