@@ -1,13 +1,3 @@
-setwd("/lustre/home/acct-clsyzs/clsyzs/SunJianle/singleCellMR/GSE196829/expression_matrix")
-
-# install.packages("BiocManager")
-# BiocManager::install("SingleCellExperiment")
-# BiocManager::install("slingshot")
-# BiocManager::install("tradeSeq")
-# BiocManager::install("scater")
-# BiocManager::install("scran")
-# BiocManager::install("bluster")
-
 library(Seurat)
 library(data.table)
 library(tidyverse)
@@ -69,37 +59,10 @@ sce_hvg <- fitGAM(counts = counts, pseudotime = pseudotime,
                   nknots = 6, verbose = FALSE)
 
 endRes <- diffEndTest(sce_hvg)
-saveRDS(endRes,"trajectory_sig.rds")
-
 endRes |> as_tibble(rownames="genes") |> arrange(pvalue) |> write_csv("trajectory_difference_B.csv")
 
+# look at significant genes
 o <- order(endRes$waldStat, decreasing = TRUE)
 sigGene <- names(sce_hvg)[o[1]]
 plotSmoothers(sce_hvg, counts, sigGene)
 
-# ###
-# seurat_obj_pl <- subset(seurat_obj,idents=c("B naive","B intermediate",
-#                                             "Plasmablast"))
-# sce_pl <- readRDS("plasa_batchcorr.rds")
-# counts <- logcounts(sce_pl)
-# pseudotime <- slingPseudotime(sce_pl, na = FALSE)
-# cellWeights <- slingCurveWeights(sce_pl)
-# sce <- fitGAM(counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
-#               nknots = 6, verbose = FALSE)
-# 
-# 
-# 
-# 
-# df_pl_scale <- seurat_obj_pl@assays$RNA@scale.data |> t()
-# df_pl_scale <- as.data.table(df_pl_scale,keep.rownames = T)
-# 
-# df_pl <- df_pl_scale[,c("rn",genes),with=F][df_pl_ti[,.(rn,donor_id,cell_type,sex,slingPseudotime_1)],on="rn"]
-# 
-# df_pl %>% fwrite("Plasma_scale_bc.csv")
-# 
-# df_pl$slingPseudotime_1 <- round(df_pl$slingPseudotime_1)
-# df_pl <- df_pl%>%dplyr::rename(pseudotime=slingPseudotime_1,id=donor_id)
-# 
-# 
-# ####
-# 
