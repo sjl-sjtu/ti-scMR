@@ -35,9 +35,9 @@ seurat_obj <- ScaleData(seurat_obj)
 # PCA
 seurat_obj <- RunPCA(seurat_obj)
 
-# Batch correction
-library(harmony)
-seurat_obj <- RunHarmony(seurat_obj,"id")
+# Batch correction (if necessary)
+# library(harmony)
+# seurat_obj <- RunHarmony(seurat_obj,"batch")
 
 # Dimension reduction
 seurat_obj <-  RunUMAP(seurat_obj, reduction="harmony",dims=1:10)
