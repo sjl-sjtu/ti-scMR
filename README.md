@@ -7,7 +7,7 @@ Trajectory-inference-based dynamic single-cell Mendelian randomization (ti-scMR)
 ![](https://github.com/sjl-sjtu/ti-scMR/blob/main/Figs/flowchart.jpg)
 
 ## Tutorial
-Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. Before starting the workflow, you need to prepare at least a single cell object (e.g. Seurat object `seurat_sc.rds` or h5ad file for Scanpy) and a file containing all genotypes `genotypes.csv` (It can be processed from VCF or other formats via PLINK). We provided a toy dataset on `example` folder. For real analysis, you should prepare other files like the locations of each SNP and gene, as well as covariates information.
+Here we used a simulated toy dataset to illustrate the workflow of ti-scMR. Before starting the workflow, you need to prepare at least a single cell object (e.g. Seurat object `seurat_sc.rds` or h5ad file for Scanpy) and a file containing all genotypes `genotypes.csv` (It can be processed from VCF or other formats via PLINK, refer `application/onek1k/genotype.sh`). We provided a toy dataset on `example` folder. For real analysis, you should prepare other files like the locations of each SNP and gene, as well as covariates information.
 
 We first process the sc-RNA count matrix using `Seurat` v5 (<https://satijalab.org/seurat/>).
 ```R
