@@ -260,3 +260,6 @@ res$gene <- genelist
 res$padj <- p.adjust(res$p,method = "BH")
 res %>% write_csv("results.csv")
 ```
+
+## Citation
+Sun, J., Dong, Q., Wei, J., Gao, Y., Yu, Z., Hu, X., & Zhang, Y. (2025). ti-scMR: trajectory-inference-based dynamic single-cell Mendelian randomization identifies causal genes underlying phenotypic differences. NAR Genomics and Bioinformatics, 7(3), lqaf082
