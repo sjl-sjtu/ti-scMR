@@ -263,3 +263,6 @@ res %>% write_csv("results.csv")
 
 ## Citation
 Sun, J., Dong, Q., Wei, J., Gao, Y., Yu, Z., Hu, X., & Zhang, Y. (2025). ti-scMR: trajectory-inference-based dynamic single-cell Mendelian randomization identifies causal genes underlying phenotypic differences. NAR Genomics and Bioinformatics, 7(3), lqaf082
+
+## Contact
+If you have any questions, contact me via <jianles@andrew.cmu.edu> or <sjl-2017@sjtu.alumni.edu.cn>.
