@@ -32,8 +32,14 @@ done
 bcftools view onek1k_genotype_converted.vcf.gz -r X -o splited/genotype_chrX.vcf.gz -Oz
 
 # check strand, imputation, download
+# check strand: conform-gt
+for i in {1..22}
+do
+  java -jar conform-gt.jar ref=ref_vcf/chr${i}.1kg.phase3.v5a.vcf.gz gt=splited/genotype_chr${i}.vcf.gz chrom=i out=harmosed/geneotype_chr${i}
+done
+# imputation: Michigan Imputation Server (on line service)
 
-cd ../imp
+cd ./imputed
 bcftools concat *.vcf.gz -o merged.vcf.gz
 bcftools query -l merged.vcf.gz > id_list.txt
 bcftools query -f '%ID\n' merged.vcf.gz > snp_list.txt
