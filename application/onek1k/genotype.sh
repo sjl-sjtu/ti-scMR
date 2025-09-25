@@ -7,6 +7,8 @@
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
 
+# convert illumina report to ped/map file
+
 awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid.txt
 
 /lustre/home/acct-clsyzs/clsyzs/SunJianle/plink2/plink2 --pedmap onek1k_genotype \
