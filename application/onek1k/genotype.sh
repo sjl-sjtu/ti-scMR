@@ -11,6 +11,7 @@
 
 awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid.txt
 
+# Quality control
 /lustre/home/acct-clsyzs/clsyzs/SunJianle/plink2/plink2 --pedmap onek1k_genotype \
     --allow-extra-chr \
     --make-pgen \
@@ -24,28 +25,32 @@ awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid
     --recode vcf \
     --out onek1k_genotype_converted
 
-bgzip onek1k_genotype_converted.vcf
-bcftools sort onek1k_genotype_converted.vcf.gz -Oz -o onek1k_genotype_converted.vcf.gz
-tabix -p vcf onek1k_genotype_converted.vcf.gz
+# Compress, sort and index VCF
+bgzip onek1k_genotype_converted.vcf  # compress
+bcftools sort onek1k_genotype_converted.vcf.gz -Oz -o onek1k_genotype_converted.vcf.gz  # sort
+tabix -p vcf onek1k_genotype_converted.vcf.gz  # index
+
+# split by chromosome
 for i in {1..22}
 do
   bcftools view onek1k_genotype_converted.vcf.gz -r ${i} -o splited/genotype_chr${i}.vcf.gz -Oz
 done
 bcftools view onek1k_genotype_converted.vcf.gz -r X -o splited/genotype_chrX.vcf.gz -Oz
 
-# check strand, imputation, download
 # check strand: conform-gt
 for i in {1..22}
 do
   java -jar conform-gt.jar ref=ref_vcf/chr${i}.1kg.phase3.v5a.vcf.gz gt=splited/genotype_chr${i}.vcf.gz chrom=i out=harmosed/geneotype_chr${i}
 done
 # imputation: Michigan Imputation Server (on line service)
+# download the imputation results and SNPs ids
 
 cd ./imputed
 bcftools concat *.vcf.gz -o merged.vcf.gz
 bcftools query -l merged.vcf.gz > id_list.txt
 bcftools query -f '%ID\n' merged.vcf.gz > snp_list.txt
 
+# Quality control after imputation
 /lustre/home/acct-clsyzs/clsyzs/SunJianle/plink2/plink2 --vcf merged.vcf.gz \
     --update-ids ID_convert.txt \
     --keep id_slt.txt \
