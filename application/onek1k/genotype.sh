@@ -7,7 +7,7 @@
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
 
-# convert illumina report to ped/map file
+# convert illumina report to ped/map file: PLINK INput Report Plug-in in GenomeStudio
 
 awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid.txt
 
