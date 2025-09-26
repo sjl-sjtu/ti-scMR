@@ -9,7 +9,7 @@
 
 # convert illumina report to ped/map file: PLINK INput Report Plug-in in GenomeStudio
 
-awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid.txt
+awk -v OFS="\t" '{gsub(",.*","",$2)}1' GSA-24v2-0_A1_b150_rsids.txt > names_rsid.txt  # snp names correspondance
 
 # Quality control
 /lustre/home/acct-clsyzs/clsyzs/SunJianle/plink2/plink2 --pedmap onek1k_genotype \
@@ -47,8 +47,8 @@ done
 
 cd ./imputed
 bcftools concat *.vcf.gz -o merged.vcf.gz
-bcftools query -l merged.vcf.gz > id_list.txt
-bcftools query -f '%ID\n' merged.vcf.gz > snp_list.txt
+bcftools query -l merged.vcf.gz > id_list.txt  # samples IDs
+bcftools query -f '%ID\n' merged.vcf.gz > snp_list.txt   # snp names
 
 # Quality control after imputation
 /lustre/home/acct-clsyzs/clsyzs/SunJianle/plink2/plink2 --vcf merged.vcf.gz \
